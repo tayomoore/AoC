@@ -14,17 +14,29 @@ def inputToGrid(input):
         grid.append(row)
     return grid
 
-def evaluateCoordinate(rowIndex, columnIndex, letter):
-    allDirections = [
-        {'direction':'r',  'minCol': 0, 'maxCol': 136, 'minRow': 0, 'maxRow': 139},
-        {'direction':'l',  'minCol': 3, 'maxCol': 139, 'minRow': 0, 'maxRow': 139},
-        {'direction':'u',  'minCol': 0, 'maxCol': 139, 'minRow': 3, 'maxRow': 139},
-        {'direction':'d',  'minCol': 0, 'maxCol': 139, 'minRow': 0, 'maxRow': 136},
-        {'direction':'ur', 'minCol': 0, 'maxCol': 136, 'minRow': 3, 'maxRow': 139},
-        {'direction':'ul', 'minCol': 3, 'maxCol': 139, 'minRow': 3, 'maxRow': 139},
-        {'direction':'dr', 'minCol': 0, 'maxCol': 136, 'minRow': 0, 'maxRow': 136},
-        {'direction':'dl', 'minCol': 3, 'maxCol': 139, 'minRow': 0, 'maxRow': 136}
-    ]
+def getDirectionsToCheck(rowLength, columnLength, stringLength, part):
+    possibleDirections = []
+    match part:
+        case 'part1':
+            possibleDirections = [
+                {'direction':'r',  'minCol': 0,                'maxCol': rowLength - stringLength, 'minRow': 0,                'maxRow': columnLength - 1},
+                {'direction':'l',  'minCol': stringLength - 1, 'maxCol': rowLength - 1,            'minRow': 0,                'maxRow': columnLength - 1},
+                {'direction':'u',  'minCol': 0,                'maxCol': rowLength - 1,            'minRow': stringLength - 1, 'maxRow': columnLength - 1},
+                {'direction':'d',  'minCol': 0,                'maxCol': rowLength - 1,            'minRow': 0,                'maxRow': columnLength - stringLength},
+                {'direction':'ur', 'minCol': 0,                'maxCol': rowLength - stringLength, 'minRow': stringLength - 1, 'maxRow': columnLength - 1},
+                {'direction':'ul', 'minCol': stringLength - 1, 'maxCol': rowLength - 1,            'minRow': stringLength - 1, 'maxRow': columnLength - 1},
+                {'direction':'dr', 'minCol': 0,                'maxCol': rowLength - stringLength, 'minRow': 0,                'maxRow': columnLength - stringLength},
+                {'direction':'dl', 'minCol': stringLength - 1, 'maxCol': rowLength - 1,            'minRow': 0,                'maxRow': columnLength - stringLength}
+            ]
+        case 'part2':
+            possibleDirections = [
+                {'direction':'x', 'minCol': stringLength // 2, 'maxCol': (rowLength-1) - stringLength // 2, 'minRow': stringLength // 2, 'maxRow': (columnLength-1) - stringLength // 2},
+            ]
+    return possibleDirections
+
+
+
+def evaluateCoordinate(rowIndex, columnIndex, letter, allDirections):
     possibleDirections = []
     if letter != 'X':
         return False, possibleDirections
@@ -92,19 +104,31 @@ def countXmas(puzzleGrid, rowIndex, columnIndex, directionsToCheck):
 
 def part1(input):
     puzzleGrid = inputToGrid(input)
+    allDirections = getDirectionsToCheck(len(puzzleGrid[0]), len(puzzleGrid), 4, 'part1')
     xmasCount = 0
     for rowIndex, row in enumerate(puzzleGrid):
         for columnIndex, letter in enumerate(row):
-            isCandidate, directionsToCheck = evaluateCoordinate(rowIndex, columnIndex, letter)
+            isCandidate, directionsToCheck = evaluateCoordinate(rowIndex, columnIndex, letter, allDirections)
             if isCandidate:
                 xmasCount += countXmas(puzzleGrid, rowIndex, columnIndex, directionsToCheck)
     return xmasCount
 
 
+def part2(input):
+    puzzleGrid = inputToGrid(input)
+    allDirections = getDirectionsToCheck(len(puzzleGrid[0]), len(puzzleGrid), 3, 'part2')
+    xmasCount = 0
+    for rowIndex, row in enumerate(puzzleGrid):
+        for columnIndex, letter in enumerate(row):
+            isCandidate, directionsToCheck = evaluateCoordinate(rowIndex, columnIndex, letter, allDirections)
+            if isCandidate:
+                xmasCount += countXmas(puzzleGrid, rowIndex, columnIndex, directionsToCheck)
+    return xmasCount
+
 def main():
     input = getPuzzleInput()
     partOneAnswer = part1(input)
-    #partTwoAnswer = part2(input)
+    partTwoAnswer = part2(input)
     print(f'Part one answer: {partOneAnswer}')
     #print(f'Part two answer: {partTwoAnswer}')
 
